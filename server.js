@@ -60,8 +60,50 @@ async function startServer() {
         });
 
         app.put('/quotes', (req, res) => {
-            console.log(req.body)
+            const { name, quote } = req.body;
+        
+            quotesCollection.findOneAndUpdate(
+                { name: 'Yoda' }, // Update the quote for Yoda
+                {
+                    $set: { name, quote }
+                },
+                { upsert: true }
+            )
+            .then(result => {
+                console.log("Quote updated or created:", result);
+                res.send('Success');
+            })
+            .catch(error => {
+                console.error(error);
+                res.status(500).send('Error');
+            });
+        });
+
+        app.delete('quotes', (req, res) => {
+            const { name, quote } = req.body;
+        
+            quotesCollection.deleteO(
+                { name: 'Darth Vader' }, // Update the quote for Darth Vader
+                {
+                    $set: { name, quote }
+                },
+                { upsert: true }
+            )
+            .then(result => {
+                if (result.deletedCount === 0) {
+                return res.json('No quote to delete')
+                }
+                res.json(`Deleted Darth Vader's quote`)
+            })
+
+            .catch(error => {
+                console.error(error);
+                res.status(500).send('Error');
+            });
+         
         })
+
+     
 
     } catch (err) {
         console.error(err);
